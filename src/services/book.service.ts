@@ -40,6 +40,24 @@ export const getBook = async (id: TBookID): Promise<TBookRead | null> => {
   });
 };
 
+export const findBookByTitleAndAuthor = async (title: string, authorId: number): Promise<TBookRead | null> => {
+  return db.book.findFirst({
+    where: {
+      title,
+      authorId,
+    },
+    select: {
+      id: true,
+      title: true,
+      isFiction: true,
+      datePublished: true,
+      author: {
+        select: { id: true, firstName: true, lastName: true },
+      },
+    },
+  });
+};
+
 export const createBook = async (book: TBookWrite): Promise<TBookRead> => {
   const { title, authorId, datePublished, isFiction } = book;
   const parsedDate: Date = new Date(datePublished);

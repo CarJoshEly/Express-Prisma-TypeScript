@@ -65,6 +65,15 @@ export const sendValidationError = <T>(
   });
 };
 
+// Conflict response (e.g., duplicate record)
+export const sendConflictResponse = <T>(
+  res: Response,
+  message: T,
+  status = HttpStatusCode.CONFLICT
+): Response<ErrorResponse<T>> => {
+  return res.status(status).json({ success: false, error: { message } });
+};
+
 // Unauthorized response
 export const sendUnauthorizedResponse = <T>(
   res: Response,

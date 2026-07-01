@@ -16,7 +16,13 @@ router.get('/:id', AuthorController.checkExistingAuthor, AuthorController.getAut
 // Acess : Private
 // POST : Create one author
 // Params body : firstName , lastName
-router.post('/', protectAuth, AuthorController.validateAuthorData, AuthorController.createAuthor);
+router.post(
+  '/',
+  protectAuth,
+  AuthorController.validateAuthorData,
+  AuthorController.checkDuplicateAuthor,
+  AuthorController.createAuthor
+);
 
 // Acess : Private
 // PUT : update an author
@@ -27,6 +33,7 @@ router.put(
   protectAuth,
   AuthorController.validateAuthorData,
   AuthorController.checkExistingAuthor,
+  AuthorController.checkDuplicateAuthor,
   AuthorController.updateAuthor
 );
 

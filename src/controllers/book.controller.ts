@@ -4,7 +4,7 @@ import * as AuthorService from '../services/author.service';
 import { NextFunction, Request, Response } from 'express';
 import { bookSchema } from '../types/zod';
 import { TBookWrite } from '../types/general';
-import { sendNotFoundResponse, sendSuccessNoDataResponse, sendSuccessResponse } from '../utils/responseHandler';
+import { sendNotFoundResponse, sendSuccessNoDataResponse, sendSuccessResponse, sendConflictResponse } from '../utils/responseHandler';
 
 export const listBooks = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -91,6 +91,23 @@ export const validateBookData = (request: Request, response: Response, next: Nex
     const book = request.body;
     book.datePublished = new Date(book.datePublished);
     bookSchema.parse(book);
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkDuplicateBook = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { title, authorId } = request.body;
+    const existingBook = await BookService.findBookByTitleAndAuthor(title, authorId);
+
+    const currentId = request.params.id ? parseInt(request.params.id, 10) : null;
+
+    if (existingBook && existingBook.id !== currentId) {
+      return sendConflictResponse(response, `Este autor ya tiene un libro titulado "${title}"`);
+    }
+
     next();
   } catch (error) {
     next(error);

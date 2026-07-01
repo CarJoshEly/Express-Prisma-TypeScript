@@ -3,7 +3,7 @@ import * as AuthorService from '../services/author.service';
 import { NextFunction, Request, Response } from 'express';
 import { authorSchema } from '../types/zod';
 import { TAuthorWrite } from '../types/general';
-import { sendNotFoundResponse, sendSuccessNoDataResponse, sendSuccessResponse } from '../utils/responseHandler';
+import { sendNotFoundResponse, sendSuccessNoDataResponse, sendSuccessResponse, sendConflictResponse } from '../utils/responseHandler';
 
 export const listAuthors = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -72,6 +72,24 @@ export const validateAuthorData = (request: Request, response: Response, next: N
   try {
     const author = request.body;
     authorSchema.parse(author);
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkDuplicateAuthor = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { firstName, lastName } = request.body;
+    const existingAuthor = await AuthorService.findAuthorByName(firstName, lastName);
+
+    // En PUT, params.id existe (el propio autor). En POST, no existe ninguno.
+    const currentId = request.params.id ? parseInt(request.params.id, 10) : null;
+
+    if (existingAuthor && existingAuthor.id !== currentId) {
+      return sendConflictResponse(response, `Ya existe un autor llamado "${firstName} ${lastName}"`);
+    }
+
     next();
   } catch (error) {
     next(error);

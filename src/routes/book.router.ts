@@ -21,6 +21,7 @@ router.post(
   protectAuth,
   BookController.validateBookData,
   BookController.checkExistingBookAuthor,
+  BookController.checkDuplicateBook,
   BookController.createBook
 );
 
@@ -34,6 +35,7 @@ router.put(
   BookController.validateBookData,
   BookController.checkExistingBook,
   BookController.checkExistingBookAuthor,
+  BookController.checkDuplicateBook,
   BookController.updateBook
 );
 

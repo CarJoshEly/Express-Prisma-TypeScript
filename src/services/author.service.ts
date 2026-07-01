@@ -21,6 +21,15 @@ export const getAuthor = async (id: TAuthorID): Promise<TAuthorRead | null> => {
   });
 };
 
+export const findAuthorByName = async (firstName: string, lastName: string): Promise<TAuthorRead | null> => {
+  return db.author.findFirst({
+    where: {
+      firstName,
+      lastName,
+    },
+  });
+};
+
 export const createAuthor = async (author: TAuthorWrite): Promise<TAuthorRead> => {
   const { firstName, lastName } = author;
   return db.author.create({
